@@ -83,6 +83,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Landing Page
+app.use(express.static('homepage'))
+
 app.use("/bikes", bikesRouter); // this is the new line
 
 // Create new bearer token
