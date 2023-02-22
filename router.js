@@ -2,7 +2,7 @@ import slugify from "slugify";
 import { v4 as uuidv4 } from "uuid";
 import { Record, String, Number, Boolean } from "runtypes";
 
-import { authenticateUser } from "./auth.js";
+import { authenticateUser } from "./utils/auth.js";
 
 import { Router } from "express";
 import CyclicDB from "@cyclic.sh/dynamodb";
