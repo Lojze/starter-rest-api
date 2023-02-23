@@ -2,13 +2,13 @@ import slugify from "slugify";
 import { v4 as uuidv4 } from "uuid";
 import { Record, String, Number, Boolean } from "runtypes";
 
-import { authenticateUser } from "./utils/auth.js";
+import { authenticateUser } from "../utils/auth.js";
 
 import { Router } from "express";
 import CyclicDB from "@cyclic.sh/dynamodb";
 
 // Initialize Express router
-export const router = Router();
+export const bikes = Router();
 
 // Initialize AWS CyclicDB
 const db = CyclicDB(process.env.CYCLIC_DB);
@@ -19,7 +19,7 @@ const bikesCollection = db.collection("bikes");
 // ------------------------------------
 
 // Get all bikes/比较慢
-router.get("/all", authenticateUser, async (req, res) => {
+bikes.get("/all", authenticateUser, async (req, res) => {
   const { results: bikesMetadata } = await bikesCollection.list();
 
   const bikes = await Promise.all(
@@ -30,7 +30,7 @@ router.get("/all", authenticateUser, async (req, res) => {
 });
 
 // Get bike by ID
-router.get("/:id", authenticateUser, async (req, res) => {
+bikes.get("/:id", authenticateUser, async (req, res) => {
   const id = req.params.id;
 
   try {
@@ -43,7 +43,7 @@ router.get("/:id", authenticateUser, async (req, res) => {
 });
 
 // Get bike by handle 查询名称/比较慢
-router.get("/by-handle/:handle", authenticateUser, async (req, res) => {
+bikes.get("/by-handle/:handle", authenticateUser, async (req, res) => {
   const handle = req.params.handle;
 
   try {
@@ -59,7 +59,7 @@ router.get("/by-handle/:handle", authenticateUser, async (req, res) => {
 });
 
 // Search bikes by title/ 搜索：支持模糊搜索search/by-title?query=xx
-router.get("/search/by-title", authenticateUser, async (req, res) => {
+bikes.get("/search/by-title", authenticateUser, async (req, res) => {
   const query = req.query.query || "";
 
   try {
@@ -108,7 +108,7 @@ const BikeData = Record({
 
 
 // Create new bike / 上传一段json
-router.post("/", authenticateUser, async (req, res) => {
+bikes.post("/", authenticateUser, async (req, res) => {
     const bikeData = req.body;
 
     try {
@@ -144,7 +144,7 @@ router.post("/", authenticateUser, async (req, res) => {
 // 根据id 修改 /两种方式一种删除，在添加/直接覆盖
 // put 替换整个 数据
 // Update entire bike
-router.put("/:id", authenticateUser, async (req, res) => {
+bikes.put("/:id", authenticateUser, async (req, res) => {
     const bikeId = req.params.id;
     const bikeData = req.body;
 
@@ -180,7 +180,7 @@ router.put("/:id", authenticateUser, async (req, res) => {
 // ------------------------------------
 
 // Patch bike if it exists 更新数据/传入想要修改的参数即可
-router.patch("/:id", authenticateUser, async (req, res) => {
+bikes.patch("/:id", authenticateUser, async (req, res) => {
     const bikeId = req.params.id;
     const newData = req.body || {};
 
@@ -204,7 +204,7 @@ router.patch("/:id", authenticateUser, async (req, res) => {
 // ------------------------------------
 
 // Delete bike if it exists
-router.delete("/:id", authenticateUser, async (req, res) => {
+bikes.delete("/:id", authenticateUser, async (req, res) => {
     const bikeId = req.params.id;
 
     try {
