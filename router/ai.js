@@ -24,26 +24,31 @@ ai.post("/quaere", async (req, res) => {
             key: process.env.API_KEY,
             appid: process.env.APPID,
         });
-        let answer = await spark.chat({content:`请帮我生成一个${prompts},回复的时候简单概况说明`});
+        let answer = await spark.chat({content:`请帮我创造${prompts},直接回复我，不用加头部描述，在200字内`});
+        console.log(answer)
+        if (answer) {
+            // 添加数据
+            const id = uuidv4();
+            const titleHandle = answer;
+        
+            // 生成数据
+            const aiIdeas = {
+                id,
+                title: titleHandle,
+                typeTitle:prompts,
+                like:0
+            };
+            await aiIdeasCollection.set(id, aiIdeas);
+        
+            // 返回数据
+            const { results } = await aiIdeasCollection.list();
+            res.send(results);
+        } else {
+            res.send("没有生成想法");
+        }
     
-        // 添加数据
-        const id = uuidv4();
-        const titleHandle = answer;
-    
-        // 生成数据
-        const aiIdeas = {
-            id,
-            title: titleHandle,
-            typeTitle:prompts,
-            like:0
-        };
-        await aiIdeasCollection.set(id, aiIdeas);
-    
-        // 返回数据
-        const { results } = await aiIdeasCollection.list();
-        res.send(results);
     } catch (e) {
-        console.log(e.message, `Item with ID ${id} does not exist.`);
+        console.log(e.message, `自动生成想法失败`);
         res.sendStatus(201);
     }
 })
@@ -60,7 +65,7 @@ ai.get("/all",async (req, res) => {
             total:bikesMetadata.length
         });
     } catch (e) {
-        console.log(e.message, `Item with ID ${key} does not exist.`);
+        console.log(e.message, `查询所有数据失败`);
         res.sendStatus(201);
     }
 });
@@ -113,10 +118,22 @@ ai.post("/like", async (req, res) => {
             id:key
         });
     } catch (e) {
-        console.log(e.message, `Item with ID ${key} does not exist.`);
+        console.log(e.message, `like失败`);
         res.sendStatus(201);
     }
 });
+
+// 删除数据
+ai.post("/delete", async (req, res) => {
+    const { key } = req.body;
+    try {
+        await aiIdeasCollection.delete(key);
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e.message, `删除数据失败`);
+        res.sendStatus(201);
+    }
+})
 
 
 cron.schedule('0 * * * *', async() => {
@@ -129,19 +146,22 @@ cron.schedule('0 * * * *', async() => {
             appid: process.env.APPID,
         });
         let answer = await spark.chat({content:`请帮我生成一个${prompts},回复的时候简单概况说明`});
+
+        if (answer) {
+            // 添加数据
+            const id = uuidv4();
+            const titleHandle = answer;
+        
+            // 生成数据
+            const aiIdeas = {
+                id,
+                title: titleHandle,
+                typeTitle:prompts,
+                like:0
+            };
+            await aiIdeasCollection.set(id, aiIdeas);
+        }
     
-        // 添加数据
-        const id = uuidv4();
-        const titleHandle = answer;
-    
-        // 生成数据
-        const aiIdeas = {
-            id,
-            title: titleHandle,
-            typeTitle:prompts,
-            like:0
-        };
-        await aiIdeasCollection.set(id, aiIdeas);
     } catch (error) {
         console.log(error);
     }
