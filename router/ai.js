@@ -15,7 +15,7 @@ import {getRandomList,getTopByLike,getNewlyAddedIdeas,isYesterday,isToday,getWee
 export const ai = Router();
 
 //  创建一个新的想法
-ai.post("/quaere",authenticateUser, async (req, res) => {
+ai.post("/quaere", async (req, res) => {
     try {
         const prompts = promptsList[Math.floor(Math.random() * promptsList.length)]
         const spark = new Spark({
@@ -49,7 +49,7 @@ ai.post("/quaere",authenticateUser, async (req, res) => {
 })
 
 // 查询所有数据
-ai.get("/all", authenticateUser,async (req, res) => {
+ai.get("/all",async (req, res) => {
     try {
         const { results:bikesMetadata } = await aiIdeasCollection.list();
         const bikes = await Promise.all(
@@ -102,7 +102,7 @@ const processData = (arr) => {
 }
 
 // 喜欢或者不喜欢
-ai.post("/like",authenticateUser, async (req, res) => {
+ai.post("/like", async (req, res) => {
     const { key, like } = req.body;
     try {
         const { props: bike } = await aiIdeasCollection.get(key);
