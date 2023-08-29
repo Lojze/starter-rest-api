@@ -45,8 +45,7 @@ ai.post("/quaere",authenticateUser, async (req, res) => {
     } catch (e) {
         console.log(e.message, `Item with ID ${id} does not exist.`);
         res.sendStatus(201);
-    }   
-        
+    }
 })
 
 // 查询所有数据
@@ -122,13 +121,27 @@ ai.post("/like",authenticateUser, async (req, res) => {
 
 cron.schedule('0 * * * *', async() => {
     try {
-        await fetch(`http://localhost:3000/ai/quaere`,{ 
-            method: "POST",
-            headers: {
-                Authorization: `Token ${generateAccessToken({username:'lojze'})}`,
-                "Content-Type": "application/json",
-            },
-        })
+        const prompts = promptsList[Math.floor(Math.random() * promptsList.length)]
+        const spark = new Spark({
+            // 自行填入相关参数
+            secret: process.env.API_SECRET,
+            key: process.env.API_KEY,
+            appid: process.env.APPID,
+        });
+        let answer = await spark.chat({content:`请帮我生成一个${prompts},回复的时候简单概况说明`});
+    
+        // 添加数据
+        const id = uuidv4();
+        const titleHandle = answer;
+    
+        // 生成数据
+        const aiIdeas = {
+            id,
+            title: titleHandle,
+            typeTitle:prompts,
+            like:0
+        };
+        await aiIdeasCollection.set(id, aiIdeas);
     } catch (error) {
         console.log(error);
     }
