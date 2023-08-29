@@ -24,7 +24,7 @@ ai.post("/quaere", async (req, res) => {
             key: process.env.API_KEY,
             appid: process.env.APPID,
         });
-        let answer = await spark.chat({content:`请帮我创造${prompts},直接回复我，不用加头部描述，在200字内`});
+        let answer = await spark.chat({content:`请帮我创造${prompts},请直接回复我，内容在200字内`});
         console.log(answer)
         if (answer) {
             // 添加数据
