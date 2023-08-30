@@ -17,7 +17,7 @@ export const ai = Router();
 //  创建一个新的想法
 ai.post("/quaere", async (req, res) => {
     try {
-        const prompts = "设计创业想法"|| promptsList[Math.floor(Math.random() * promptsList.length)]
+        const prompts = promptsList[Math.floor(Math.random() * promptsList.length)]
         const spark = new Spark({
             // 自行填入相关参数
             secret: process.env.API_SECRET,
@@ -150,7 +150,7 @@ cron.schedule('0 * * * *', async() => {
             uid:"5f9b3b3b4b5b4a0001b2b2b2",
         });
         let answer = await spark.chat({content:`请帮我创造${prompts},请直接回复我，内容在200字内,之前回答重复的请重新回答`});
-
+        console.log(answer)
         if (answer) {
             // 添加数据
             const id = uuidv4();
