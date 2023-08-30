@@ -146,8 +146,10 @@ cron.schedule('0 * * * *', async() => {
             secret: process.env.API_SECRET,
             key: process.env.API_KEY,
             appid: process.env.APPID,
+            chatId:"5f9b3b3b4b5b4a0001b2b2b2",
+            uid:"5f9b3b3b4b5b4a0001b2b2b2",
         });
-        let answer = await spark.chat({content:`请帮我生成一个${prompts},回复的时候简单概况说明`});
+        let answer = await spark.chat({content:`请帮我创造${prompts},请直接回复我，内容在200字内,之前回答重复的请重新回答`});
 
         if (answer) {
             // 添加数据
